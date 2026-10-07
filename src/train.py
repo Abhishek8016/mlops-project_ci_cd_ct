@@ -7,6 +7,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
+# Allow legacy file store in newer MLflow versions for CI/local runs
+os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+
 mlflow.set_tracking_uri(
     os.environ.get("MLFLOW_TRACKING_URI", "file:./mlruns")
 )
@@ -17,7 +20,7 @@ def train():
   with mlflow.start_run():
     data_path = "data/raw_data.csv"
 
-    # Fallback: Generate sample data if not present (e.g., in clean CI environments)
+    # Fallback: Generate sample dataset if not present (e.g., in clean CI environments)
     if not os.path.exists(data_path):
       os.makedirs("data", exist_ok=True)
       df_dummy = pd.DataFrame({
