@@ -1,0 +1,15 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Container Image
+        run: docker build -t ml-app-inference .
+      - name: Deploy Placeholder
+        run: echo "Model container built successfully and ready for deployment!"

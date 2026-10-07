@@ -1,0 +1,30 @@
+name: CT Pipeline
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Pull Data via DVC
+        run: dvc pull || echo "No remote configured, using local data"
+      - name: Retrain Model & Track via MLflow
+        run: python src/train.py
+      - name: Version Model with DVC
+        run: |
+          dvc add models/model.pkl
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add models/model.pkl.dvc .dvc/ignore
+          git commit -m "Auto-retrained and versioned model via CT" || echo "No changes"
+          git push
