@@ -56,7 +56,10 @@ def train():
     mlflow.log_metric("accuracy", acc)
     mlflow.log_metric("f1_score", f1)
 
-    mlflow.sklearn.log_model(model, "model")
+    # Trust sklearn tree types for modern MLflow/skops audit check
+    mlflow.sklearn.log_model(
+        model, "model", skops_trusted_types=["sklearn.tree._tree.Tree"]
+    )
 
     os.makedirs("models", exist_ok=True)
     joblib.dump(model, "models/model.pkl")
